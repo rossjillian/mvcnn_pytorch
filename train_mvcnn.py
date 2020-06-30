@@ -22,14 +22,16 @@ parser.add_argument("-train_path", type=str, default="modelnet40_images_new_12x/
 parser.add_argument("-val_path", type=str, default="modelnet40_images_new_12x/*/test")
 parser.set_defaults(train=False)
 
+
 def create_folder(log_dir):
     # make summary folder
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
     else:
-        print('WARNING: summary folder already exists!! It will be overwritten!!')
+        print('WARNING: summary folder already exists! It will be overwritten!!')
         shutil.rmtree(log_dir)
         os.mkdir(log_dir)
+
 
 if __name__ == '__main__':
     args = parser.parse_args()

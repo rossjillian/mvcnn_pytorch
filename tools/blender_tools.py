@@ -40,6 +40,7 @@ def add_cameras(cam_name, obj_name, n):
 
 def take_pictures(file_path):
     """
+    Take 1 picture at each camera labeled Camera.XXX
     """
     scene_key = bpy.data.scenes.keys()[0]
 

@@ -10,6 +10,7 @@ import torchvision as vision
 from torchvision import transforms, datasets
 import random
 
+
 class MultiviewImgDataset(torch.utils.data.Dataset):
 
     def __init__(self, root_dir, scale_aug=False, rot_aug=False, test_mode=False, \
@@ -18,7 +19,8 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
                          'cone','cup','curtain','desk','door','dresser','flower_pot','glass_box',
                          'guitar','keyboard','lamp','laptop','mantel','monitor','night_stand',
                          'person','piano','plant','radio','range_hood','sink','sofa','stairs',
-                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox','capsule','cube',
+                         'cylinder','sphere']
         self.root_dir = root_dir
         self.scale_aug = scale_aug
         self.rot_aug = rot_aug
@@ -48,7 +50,6 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
                 filepaths_new.extend(self.filepaths[rand_idx[i]*num_views:(rand_idx[i]+1)*num_views])
             self.filepaths = filepaths_new
 
-
         if self.test_mode:
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
@@ -63,10 +64,8 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
                                      std=[0.229, 0.224, 0.225])
             ])
 
-
     def __len__(self):
         return int(len(self.filepaths)/self.num_views)
-
 
     def __getitem__(self, idx):
         path = self.filepaths[idx*self.num_views]
@@ -83,16 +82,15 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
         return (class_id, torch.stack(imgs), self.filepaths[idx*self.num_views:(idx+1)*self.num_views])
 
 
-
 class SingleImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, root_dir, scale_aug=False, rot_aug=False, test_mode=False, \
-                 num_models=0, num_views=12):
+    def __init__(self, root_dir, scale_aug=False, rot_aug=False, test_mode=False, num_models=0, num_views=12):
         self.classnames=['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair',
                          'cone','cup','curtain','desk','door','dresser','flower_pot','glass_box',
                          'guitar','keyboard','lamp','laptop','mantel','monitor','night_stand',
                          'person','piano','plant','radio','range_hood','sink','sofa','stairs',
-                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox','capsule','cube',
+                         'cylinder','sphere']
         self.root_dir = root_dir
         self.scale_aug = scale_aug
         self.rot_aug = rot_aug
@@ -116,10 +114,8 @@ class SingleImgDataset(torch.utils.data.Dataset):
                                  std=[0.229, 0.224, 0.225])
         ])
 
-
     def __len__(self):
         return len(self.filepaths)
-
 
     def __getitem__(self, idx):
         path = self.filepaths[idx]
