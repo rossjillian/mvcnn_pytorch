@@ -80,6 +80,7 @@ class ModelNetTrainer(object):
             i_acc += i
 
             # evaluation
+            print("Evaluation")
             if (epoch+1)%1==0:
                 with torch.no_grad():
                     loss, val_overall_acc, val_mean_class_acc = self.update_validation_accuracy(epoch)
@@ -109,8 +110,8 @@ class ModelNetTrainer(object):
         # out_data = None
         # target = None
 
-        wrong_class = np.zeros(40)
-        samples_class = np.zeros(40)
+        wrong_class = np.zeros(44)
+        samples_class = np.zeros(44)
         all_loss = 0
 
         self.model.eval()
@@ -147,7 +148,7 @@ class ModelNetTrainer(object):
 
         print ('Total # of test models: ', all_points)
         val_mean_class_acc = np.mean((samples_class-wrong_class)/samples_class)
-        acc = all_correct_points.float() / all_points
+        acc = float(all_correct_points) / all_points
         val_overall_acc = acc.cpu().data.numpy()
         loss = all_loss / len(self.val_loader)
 

@@ -46,17 +46,17 @@ if __name__ == '__main__':
     # STAGE 1
     log_dir = args.name+'_stage_1'
     create_folder(log_dir)
-    cnet = SVCNN(args.name, nclasses=40, pretraining=pretraining, cnn_name=args.cnn_name)
+    cnet = SVCNN(args.name, nclasses=44, pretraining=pretraining, cnn_name=args.cnn_name)
 
     optimizer = optim.Adam(cnet.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     
     n_models_train = args.num_models*args.num_views
 
     train_dataset = SingleImgDataset(args.train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=0)
 
     val_dataset = SingleImgDataset(args.val_path, scale_aug=False, rot_aug=False, test_mode=True)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=0)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=16, shuffle=False, num_workers=0)
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), 'svcnn', log_dir, num_views=1)
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # STAGE 2
     log_dir = args.name+'_stage_2'
     create_folder(log_dir)
-    cnet_2 = MVCNN(args.name, cnet, nclasses=40, cnn_name=args.cnn_name, num_views=args.num_views)
+    cnet_2 = MVCNN(args.name, cnet, nclasses=44, cnn_name=args.cnn_name, num_views=args.num_views)
     del cnet
 
     optimizer = optim.Adam(cnet_2.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.999))
