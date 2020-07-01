@@ -124,29 +124,29 @@ class ModelNetTrainer(object):
         all_pred = []
 
         for _, data in enumerate(self.val_loader, 0):
+            if torch.cuda.is_available():
+                if self.model_name == 'mvcnn':
+                    N,V,C,H,W = data[1].size()
+                    in_data = Variable(data[1]).view(-1,C,H,W).cuda()
+                else:#'svcnn'
+                    in_data = Variable(data[1]).cuda()
+                target = Variable(data[0]).cuda()
 
-            if self.model_name == 'mvcnn':
-                N,V,C,H,W = data[1].size()
-                in_data = Variable(data[1]).view(-1,C,H,W).cuda()
-            else:#'svcnn'
-                in_data = Variable(data[1]).cuda()
-            target = Variable(data[0]).cuda()
+                out_data = self.model(in_data)
+                pred = torch.max(out_data, 1)[1]
+                all_loss += self.loss_fn(out_data, target).cpu().data.numpy()
+                results = pred == target
 
-            out_data = self.model(in_data)
-            pred = torch.max(out_data, 1)[1]
-            all_loss += self.loss_fn(out_data, target).cpu().data.numpy()
-            results = pred == target
+                for i in range(results.size()[0]):
+                    if not bool(results[i].cpu().data.numpy()):
+                        wrong_class[target.cpu().data.numpy().astype('int')[i]] += 1
+                    samples_class[target.cpu().data.numpy().astype('int')[i]] += 1
+                correct_points = torch.sum(results.long())
 
-            for i in range(results.size()[0]):
-                if not bool(results[i].cpu().data.numpy()):
-                    wrong_class[target.cpu().data.numpy().astype('int')[i]] += 1
-                samples_class[target.cpu().data.numpy().astype('int')[i]] += 1
-            correct_points = torch.sum(results.long())
+                all_correct_points += correct_points
+                all_points += results.size()[0]
 
-            all_correct_points += correct_points
-            all_points += results.size()[0]
-
-        print ('Total # of test models: ', all_points)
+        print('Total # of test models: ', all_points)
         val_mean_class_acc = np.mean((samples_class-wrong_class)/samples_class)
         acc = float(all_correct_points) / all_points
         val_overall_acc = acc.cpu().data.numpy()
